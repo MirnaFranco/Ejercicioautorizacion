@@ -101,7 +101,8 @@ export const loginPage = () => {
       });
 
       if (!response.ok) {
-        divError.innerText = "Credenciales inválidas";
+        document.getElementById("message").innerText = "Credenciales inválidas";
+        return;
         divError.classList.add(
           "bg-danger",
           "text-white",
@@ -121,7 +122,10 @@ export const loginPage = () => {
       const data = await response.json();
       console.log(data);
       window.location.pathname = "/home";
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error:", error);
+      document.getElementById("message").innerText ="ocurrió un error. Inténtalo de nuevo";
+    }
   });
 
   container.appendChild(form);
