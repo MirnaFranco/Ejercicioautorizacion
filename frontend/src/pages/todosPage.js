@@ -45,8 +45,8 @@ export const todosPage = () => {
     modal.innerHTML = `
       <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white p-4 rounded shadow-md w-1/3">
-      <h2 class="text-xl font-bold mb-4">Editar Tarea</h2>
-      <form id="editTodoForm">
+      <h2 class="text-xl font-bold mb-4">Crear Tarea</h2>
+      <form id="createTodoForm">
 
         <label for="title">Título</label>
         <input type="text" id="title" name="title" class="border p-2 w-full mb-4" placeholder="Título de la tarea" required>
@@ -67,20 +67,19 @@ export const todosPage = () => {
 `;
     document.body.appendChild(modal);
 
-    document.getElementById('editTodoForm').addEventListener('submit', function(event) {
+    /* document.getElementById('editTodoForm').addEventListener('submit', function(event) {
       event.preventDefault();
   
       const formData = new FormData(this);
       const data = {
-          id : req.body.id,
+          id:,
           title: formData.get('title'),
           completed: formData.get('completed') === 'true',
-          owner: req.user.id
+          owner: formData.get('owner')
       };
   
-      fetch('http://localhost:4000/todos', {
-          method: 'PUT', 
-          credentials: 'include',
+      fetch('https://tu-api.com/tareas', {
+          method: data.id ? 'PUT' : 'POST', // Usa PUT si hay un ID, de lo contrario usa POST
           headers: {
               'Content-Type': 'application/json'
           },
@@ -94,12 +93,26 @@ export const todosPage = () => {
     .catch((error) => {
         console.error('Error:', error);
     });
-});
+}); */
 
 document.getElementById('closeModal').addEventListener('click', function() {
     document.body.removeChild(modal);
 });
-  
+
+document.body.appendChild(modal);
+
+    // Close modal event
+    document.getElementById('closeModal').addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    // Handle form submission
+    document.getElementById('createTodoForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById('title').value;
+      const completed = document.getElementById('completed').value === 'true';
+
       // Make a POST request to create a new todo
       fetch('http://localhost:4000/todos', {
         method: 'POST',
@@ -122,7 +135,7 @@ document.getElementById('closeModal').addEventListener('click', function() {
         console.error('Error creando la tarea:', error);
       });
     });
-  };
+  });
 
   const table = document.createElement("table");
   table.classList.add(
@@ -231,7 +244,7 @@ document.getElementById('closeModal').addEventListener('click', function() {
     tr.appendChild(td5);
     tbody.appendChild(tr);
   }
-;
+};
 
 
 // Función para editar una tarea
@@ -256,13 +269,21 @@ function editTodo(todo) {
 
 // Función para eliminar una tarea
 function deleteTodo(todoId) {
+   
   fetch(`http://localhost:4000/todos/${todoId}`, {
     method: 'DELETE',
     credentials: 'include'
   })
   .then(response => {
     if (response.ok) {
-      console.log('Tarea eliminada');
+      alert('Tarea eliminada');
+      const todos = document.querySelectorAll("tr")
+
+      todos.forEach( tr => {
+        if(parseInt(tr.children[0].innerText) === todoId){
+          tr.remove()
+        }
+      })
       // Aquí puedes eliminar la tarea de la tabla si es necesario
     } else {
       console.error('Error al eliminar la tarea');
@@ -272,3 +293,29 @@ function deleteTodo(todoId) {
     console.error('Error al eliminar la tarea:', error);
   });
 }
+btnEdit.addEventListener("click", () => {
+    const modal = document.createElement('div');
+    modal.innerHTML = `
+      <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-4 rounded shadow-md w-1/3">
+      <h2 class="text-xl font-bold mb-4">Editar Tarea</h2>
+      <form id="createTodoForm">
+
+        <label for="title">Título</label>
+        <input type="text" id="title" name="title" class="border p-2 w-full mb-4" placeholder="Título de la tarea" required>
+
+        <label for="completed">Completado</label>
+        <select id="completed" name="completed" class="border p-2 w-full mb-4">
+          <option value="false">No</option>
+          <option value="true">Sí</option>
+        </select>
+
+        <div class="flex justify-end">
+          <button type="button" class="bg-red-500 text-white px-4 py-2 rounded mr-2" id="closeModal">Cancelar</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Guardar Tarea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  `
+})
